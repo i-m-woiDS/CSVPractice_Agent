@@ -9,8 +9,7 @@ from pydantic import BaseModel, Field
 # Initialize the Gemini Client
 client = genai.Client()
 
-# 1. Define the exact structure we want. 
-# This forces the AI to fill in only these fields with zero extra text.
+
 class VolunteerRecord(BaseModel):
     name: str = Field(description="The full name of the volunteer")
     primary_skill: str = Field(description="The main skill or role they want to help with")
@@ -20,7 +19,7 @@ def ai_agent_brain(raw_application_text):
     """The Brain: Uses strict structured output formatting."""
     prompt = f"Analyze this volunteer sign-up text and extract the required fields: {raw_application_text}"
     
-    # We pass the schema directly into the model configuration
+    
     response = client.models.generate_content(
         model='gemini-3.6-flash',
         contents=prompt,
@@ -30,10 +29,10 @@ def ai_agent_brain(raw_application_text):
         )
     )
     
-    # The new SDK automatically parses the JSON directly into an object for you!
+    
     return response.parsed
 
-# --- SIMULATED INCOMING DATA ---
+
 messy_inputs = [
     "Hey! I am Sarah. I want to help with translating graphics from English to Arabic. I have a lot of free time.",
     "Salam, my name is Ahmed Malik. I do professional video editing and graphic design. I speak English and Urdu.",
@@ -45,16 +44,16 @@ print("Starting Structured AI Agent Sorting Loop...\n")
 
 with open(csv_filename, mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
-    # Clear headers matching your spreadsheet columns
+    
     writer.writerow(["Name", "Primary Skill", "Languages Spoken"])
     
     for item in messy_inputs:
         print(f"Processing raw input dynamically...")
         
-        # This now returns a clean object, NOT raw text strings!
+        
         record = ai_agent_brain(item)
         
-        # Directly write the safe, structured values without any split/replace bugs
+        
         writer.writerow([record.name, record.primary_skill, record.languages_spoken])
         
         print(f"Logged: {record.name} | {record.primary_skill} | {record.languages_spoken}")
